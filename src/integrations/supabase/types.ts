@@ -14,7 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      projects: {
+        Row: {
+          created_at: string
+          email: string | null
+          github_email: string | null
+          github_password: string | null
+          has_github: boolean | null
+          has_supabase: boolean | null
+          id: string
+          is_saas: boolean
+          notes: string | null
+          password: string | null
+          referral_email: string | null
+          referral_link: string | null
+          supabase_email: string | null
+          supabase_password: string | null
+          system_location: string | null
+          system_title: string
+          updated_at: string
+          urls: string[] | null
+          user_id: string
+          was_referred: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          github_email?: string | null
+          github_password?: string | null
+          has_github?: boolean | null
+          has_supabase?: boolean | null
+          id?: string
+          is_saas?: boolean
+          notes?: string | null
+          password?: string | null
+          referral_email?: string | null
+          referral_link?: string | null
+          supabase_email?: string | null
+          supabase_password?: string | null
+          system_location?: string | null
+          system_title: string
+          updated_at?: string
+          urls?: string[] | null
+          user_id: string
+          was_referred?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          github_email?: string | null
+          github_password?: string | null
+          has_github?: boolean | null
+          has_supabase?: boolean | null
+          id?: string
+          is_saas?: boolean
+          notes?: string | null
+          password?: string | null
+          referral_email?: string | null
+          referral_link?: string | null
+          supabase_email?: string | null
+          supabase_password?: string | null
+          system_location?: string | null
+          system_title?: string
+          updated_at?: string
+          urls?: string[] | null
+          user_id?: string
+          was_referred?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
