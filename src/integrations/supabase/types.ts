@@ -18,8 +18,8 @@ export type Database = {
         Row: {
           created_at: string
           email: string | null
-          github_email: string | null
           github_password: string | null
+          github_username: string | null
           has_github: boolean | null
           has_supabase: boolean | null
           id: string
@@ -30,6 +30,7 @@ export type Database = {
           referral_link: string | null
           supabase_email: string | null
           supabase_password: string | null
+          supabase_projeto: string | null
           system_location: string | null
           system_title: string
           updated_at: string
@@ -40,8 +41,8 @@ export type Database = {
         Insert: {
           created_at?: string
           email?: string | null
-          github_email?: string | null
           github_password?: string | null
+          github_username?: string | null
           has_github?: boolean | null
           has_supabase?: boolean | null
           id?: string
@@ -52,6 +53,7 @@ export type Database = {
           referral_link?: string | null
           supabase_email?: string | null
           supabase_password?: string | null
+          supabase_projeto?: string | null
           system_location?: string | null
           system_title: string
           updated_at?: string
@@ -62,8 +64,8 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string | null
-          github_email?: string | null
           github_password?: string | null
+          github_username?: string | null
           has_github?: boolean | null
           has_supabase?: boolean | null
           id?: string
@@ -74,6 +76,7 @@ export type Database = {
           referral_link?: string | null
           supabase_email?: string | null
           supabase_password?: string | null
+          supabase_projeto?: string | null
           system_location?: string | null
           system_title?: string
           updated_at?: string

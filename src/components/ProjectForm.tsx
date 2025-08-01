@@ -30,8 +30,9 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
   const [supabaseEmail, setSupabaseEmail] = useState("");
   const [supabasePassword, setSupabasePassword] = useState("");
   const [hasGithub, setHasGithub] = useState(false);
-  const [githubEmail, setGithubEmail] = useState("");
+  const [githubUsername, setGithubUsername] = useState("");
   const [githubPassword, setGithubPassword] = useState("");
+  const [supabaseProjeto, setSupabaseProjeto] = useState("");
   const [notes, setNotes] = useState("");
   const { toast } = useToast();
 
@@ -75,8 +76,9 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         has_supabase: hasSupabase,
         supabase_email: hasSupabase ? supabaseEmail : null,
         supabase_password: hasSupabase ? supabasePassword : null,
+        supabase_projeto: hasSupabase ? supabaseProjeto : null,
         has_github: hasGithub,
-        github_email: hasGithub ? githubEmail : null,
+        github_username: hasGithub ? githubUsername : null,
         github_password: hasGithub ? githubPassword : null,
         notes,
       });
@@ -246,7 +248,7 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
           </div>
 
           {hasSupabase && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="supabase-email">Email Supabase</Label>
                 <Input
@@ -263,6 +265,14 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
                   type="password"
                   value={supabasePassword}
                   onChange={(e) => setSupabasePassword(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="supabase-projeto">Projeto</Label>
+                <Input
+                  id="supabase-projeto"
+                  value={supabaseProjeto}
+                  onChange={(e) => setSupabaseProjeto(e.target.value)}
                 />
               </div>
             </div>
@@ -288,12 +298,11 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
           {hasGithub && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="github-email">Email GitHub</Label>
+                <Label htmlFor="github-username">Username GitHub</Label>
                 <Input
-                  id="github-email"
-                  type="email"
-                  value={githubEmail}
-                  onChange={(e) => setGithubEmail(e.target.value)}
+                  id="github-username"
+                  value={githubUsername}
+                  onChange={(e) => setGithubUsername(e.target.value)}
                 />
               </div>
               <div>
