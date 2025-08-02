@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 240 5% 96%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -17,7 +17,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 263 70% 50%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96.1%;
@@ -26,17 +26,27 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 263 70% 90%;
+    --accent-foreground: 263 70% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 263 70% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Modern gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(263 70% 50%), hsl(263 70% 60%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(240 5% 98%));
+    --gradient-background: linear-gradient(180deg, hsl(240 5% 96%), hsl(240 10% 92%));
+    
+    /* Modern shadows */
+    --shadow-elegant: 0 10px 25px -5px hsl(263 70% 50% / 0.1), 0 8px 10px -6px hsl(263 70% 50% / 0.1);
+    --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -2px hsl(0 0% 0% / 0.1);
+    --shadow-hover: 0 20px 25px -5px hsl(263 70% 50% / 0.15), 0 8px 10px -6px hsl(263 70% 50% / 0.1);
 
     --sidebar-background: 0 0% 98%;
 
@@ -101,5 +111,42 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    background: var(--gradient-background);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .modern-card {
+    @apply bg-card shadow-card hover:shadow-hover transition-all duration-300 rounded-xl border border-border/50;
+    background: var(--gradient-card);
+  }
+  
+  .glass-effect {
+    @apply backdrop-blur-sm bg-white/70 border border-white/20;
+  }
+  
+  .table-modern {
+    @apply w-full bg-card rounded-xl overflow-hidden shadow-card;
+  }
+  
+  .table-header {
+    @apply bg-gradient-to-r from-primary/5 to-primary/10 font-semibold text-primary;
+  }
+  
+  .table-row {
+    @apply hover:bg-accent/50 transition-colors duration-200 border-b border-border/30;
+  }
+  
+  .table-cell {
+    @apply p-4 text-sm;
+  }
+  
+  .btn-modern {
+    @apply bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground shadow-elegant hover:shadow-hover transform hover:scale-105 transition-all duration-200;
+  }
+  
+  .header-modern {
+    @apply backdrop-blur-lg bg-white/80 border-b border-white/20 shadow-sm;
   }
 }

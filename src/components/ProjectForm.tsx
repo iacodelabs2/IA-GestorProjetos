@@ -100,13 +100,26 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Informações Básicas */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Informações Básicas</CardTitle>
-          </CardHeader>
+    <Card className="modern-card">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary/10 rounded-xl">
+            <Plus className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <CardTitle className="text-xl">Novo Projeto</CardTitle>
+            <p className="text-sm text-muted-foreground mt-1">Preencha os dados do seu projeto</p>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Informações Básicas */}
+            <Card className="modern-card">
+              <CardHeader>
+                <CardTitle className="text-primary">Informações Básicas</CardTitle>
+              </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center space-x-2">
               <Switch
@@ -171,11 +184,11 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
           </CardContent>
         </Card>
 
-        {/* Credenciais Principais */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Credenciais Principais</CardTitle>
-          </CardHeader>
+            {/* Credenciais Principais */}
+            <Card className="modern-card">
+              <CardHeader>
+                <CardTitle className="text-primary">Credenciais Principais</CardTitle>
+              </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
@@ -232,11 +245,11 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         </Card>
       </div>
 
-      {/* Supabase */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Supabase</CardTitle>
-        </CardHeader>
+          {/* Supabase */}
+          <Card className="modern-card">
+            <CardHeader>
+              <CardTitle className="text-primary">Supabase</CardTitle>
+            </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">
             <Switch
@@ -280,11 +293,11 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         </CardContent>
       </Card>
 
-      {/* GitHub */}
-      <Card>
-        <CardHeader>
-          <CardTitle>GitHub</CardTitle>
-        </CardHeader>
+          {/* GitHub */}
+          <Card className="modern-card">
+            <CardHeader>
+              <CardTitle className="text-primary">GitHub</CardTitle>
+            </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center space-x-2">
             <Switch
@@ -319,11 +332,11 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         </CardContent>
       </Card>
 
-      {/* Observações */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Observações</CardTitle>
-        </CardHeader>
+          {/* Observações */}
+          <Card className="modern-card">
+            <CardHeader>
+              <CardTitle className="text-primary">Observações</CardTitle>
+            </CardHeader>
         <CardContent>
           <Textarea
             value={notes}
@@ -334,16 +347,18 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         </CardContent>
       </Card>
 
-      <Separator />
+          <Separator />
 
-      <div className="flex gap-4 justify-end">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          Cancelar
-        </Button>
-        <Button type="submit" disabled={loading || !systemTitle.trim()}>
-          {loading ? "Salvando..." : "Salvar Projeto"}
-        </Button>
-      </div>
-    </form>
+          <div className="flex gap-4 justify-end">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={loading || !systemTitle.trim()} className="btn-modern">
+              {loading ? "Salvando..." : "Salvar Projeto"}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
