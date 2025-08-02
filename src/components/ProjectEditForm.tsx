@@ -29,6 +29,8 @@ const formSchema = z.object({
   has_github: z.boolean().default(false),
   github_username: z.string().optional(),
   github_password: z.string().optional(),
+  github_page: z.string().optional(),
+  github_url: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -52,6 +54,8 @@ interface Project {
   has_github: boolean;
   github_username?: string;
   github_password?: string;
+  github_page?: string;
+  github_url?: string;
   notes?: string;
   created_at: string;
 }
@@ -85,6 +89,8 @@ export const ProjectEditForm = ({ project, onSuccess, onCancel }: ProjectEditFor
       has_github: project.has_github,
       github_username: project.github_username || "",
       github_password: project.github_password || "",
+      github_page: project.github_page || "",
+      github_url: project.github_url || "",
       notes: project.notes || "",
     },
   });
@@ -116,6 +122,8 @@ export const ProjectEditForm = ({ project, onSuccess, onCancel }: ProjectEditFor
           has_github: data.has_github,
           github_username: data.github_username || null,
           github_password: data.github_password || null,
+          github_page: data.github_page || null,
+          github_url: data.github_url || null,
           notes: data.notes || null,
         })
         .eq("id", project.id);
@@ -288,24 +296,46 @@ export const ProjectEditForm = ({ project, onSuccess, onCancel }: ProjectEditFor
             </div>
 
             {form.watch("has_github") && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6">
-                <div className="space-y-2">
-                  <Label htmlFor="github_username">Username GitHub</Label>
-                  <Input
-                    id="github_username"
-                    {...form.register("github_username")}
-                    placeholder="username"
-                  />
-                </div>
+              <div className="space-y-4 pl-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="github_username">Username GitHub</Label>
+                    <Input
+                      id="github_username"
+                      {...form.register("github_username")}
+                      placeholder="username"
+                    />
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="github_password">Senha GitHub</Label>
-                  <Input
-                    id="github_password"
-                    type="password"
-                    {...form.register("github_password")}
-                    placeholder="••••••••"
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="github_password">Senha GitHub</Label>
+                    <Input
+                      id="github_password"
+                      type="password"
+                      {...form.register("github_password")}
+                      placeholder="••••••••"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="github_page">Página</Label>
+                    <Input
+                      id="github_page"
+                      {...form.register("github_page")}
+                      placeholder="Ex: minha-empresa"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="github_url">URL Git</Label>
+                    <Input
+                      id="github_url"
+                      {...form.register("github_url")}
+                      placeholder="https://github.com/usuario/repositorio"
+                    />
+                  </div>
                 </div>
               </div>
             )}

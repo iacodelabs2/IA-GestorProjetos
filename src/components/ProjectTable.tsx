@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Edit, Trash2, Check, X } from "lucide-react";
+import { Edit, Trash2, Check, X, Eye } from "lucide-react";
 
 interface Project {
   id: string;
@@ -23,6 +23,8 @@ interface Project {
   has_github: boolean;
   github_username?: string;
   github_password?: string;
+  github_page?: string;
+  github_url?: string;
   notes?: string;
   created_at: string;
 }
@@ -31,9 +33,10 @@ interface ProjectTableProps {
   projects: Project[];
   onRefresh: () => void;
   onEdit: (project: Project) => void;
+  onViewDetails: (project: Project) => void;
 }
 
-export const ProjectTable = ({ projects, onRefresh, onEdit }: ProjectTableProps) => {
+export const ProjectTable = ({ projects, onRefresh, onEdit, onViewDetails }: ProjectTableProps) => {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const { toast } = useToast();
 
@@ -78,11 +81,12 @@ export const ProjectTable = ({ projects, onRefresh, onEdit }: ProjectTableProps)
   return (
     <div className="table-modern">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[800px]">
           <thead>
             <tr className="table-header">
               <th className="table-cell text-left">Título do Sistema</th>
               <th className="table-cell text-left">Local do Sistema</th>
+              <th className="table-cell text-left">URL</th>
               <th className="table-cell text-left">Email</th>
               <th className="table-cell text-center">Possui Supabase?</th>
               <th className="table-cell text-center">Possui GitHub?</th>
@@ -100,6 +104,18 @@ export const ProjectTable = ({ projects, onRefresh, onEdit }: ProjectTableProps)
                 </td>
                 <td className="table-cell text-muted-foreground">
                   {project.system_location || "-"}
+                </td>
+                <td className="table-cell text-muted-foreground">
+                  {project.urls && project.urls.length > 0 ? (
+                    <a 
+                      href={project.urls[0]} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline max-w-[200px] truncate block"
+                    >
+                      {project.urls[0]}
+                    </a>
+                  ) : "-"}
                 </td>
                 <td className="table-cell text-muted-foreground">
                   {project.email || "-"}
@@ -127,7 +143,15 @@ export const ProjectTable = ({ projects, onRefresh, onEdit }: ProjectTableProps)
                   )}
                 </td>
                 <td className="table-cell">
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onViewDetails(project)}
+                      className="h-8 w-8 p-0 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"

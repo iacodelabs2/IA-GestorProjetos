@@ -32,6 +32,8 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
   const [hasGithub, setHasGithub] = useState(false);
   const [githubUsername, setGithubUsername] = useState("");
   const [githubPassword, setGithubPassword] = useState("");
+  const [githubPage, setGithubPage] = useState("");
+  const [githubUrl, setGithubUrl] = useState("");
   const [supabaseProjeto, setSupabaseProjeto] = useState("");
   const [notes, setNotes] = useState("");
   const { toast } = useToast();
@@ -80,6 +82,8 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         has_github: hasGithub,
         github_username: hasGithub ? githubUsername : null,
         github_password: hasGithub ? githubPassword : null,
+        github_page: hasGithub ? githubPage : null,
+        github_url: hasGithub ? githubUrl : null,
         notes,
       });
 
@@ -309,23 +313,45 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
           </div>
 
           {hasGithub && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="github-username">Username GitHub</Label>
-                <Input
-                  id="github-username"
-                  value={githubUsername}
-                  onChange={(e) => setGithubUsername(e.target.value)}
-                />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="github-username">Username GitHub</Label>
+                  <Input
+                    id="github-username"
+                    value={githubUsername}
+                    onChange={(e) => setGithubUsername(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="github-password">Senha GitHub</Label>
+                  <Input
+                    id="github-password"
+                    type="password"
+                    value={githubPassword}
+                    onChange={(e) => setGithubPassword(e.target.value)}
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="github-password">Senha GitHub</Label>
-                <Input
-                  id="github-password"
-                  type="password"
-                  value={githubPassword}
-                  onChange={(e) => setGithubPassword(e.target.value)}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="github-page">Página</Label>
+                  <Input
+                    id="github-page"
+                    value={githubPage}
+                    onChange={(e) => setGithubPage(e.target.value)}
+                    placeholder="Ex: minha-empresa"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="github-url">URL Git</Label>
+                  <Input
+                    id="github-url"
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    placeholder="https://github.com/usuario/repositorio"
+                  />
+                </div>
               </div>
             </div>
           )}

@@ -18,7 +18,9 @@ export type Database = {
         Row: {
           created_at: string
           email: string | null
+          github_page: string | null
           github_password: string | null
+          github_url: string | null
           github_username: string | null
           has_github: boolean | null
           has_supabase: boolean | null
@@ -41,7 +43,9 @@ export type Database = {
         Insert: {
           created_at?: string
           email?: string | null
+          github_page?: string | null
           github_password?: string | null
+          github_url?: string | null
           github_username?: string | null
           has_github?: boolean | null
           has_supabase?: boolean | null
@@ -64,7 +68,9 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string | null
+          github_page?: string | null
           github_password?: string | null
+          github_url?: string | null
           github_username?: string | null
           has_github?: boolean | null
           has_supabase?: boolean | null
