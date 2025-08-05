@@ -10,7 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { X, Save } from "lucide-react";
+import { X, Save, Target, Plus, Trash2 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 const formSchema = z.object({
   system_title: z.string().min(1, "Título é obrigatório"),
@@ -32,6 +33,7 @@ const formSchema = z.object({
   github_page: z.string().optional(),
   github_url: z.string().optional(),
   notes: z.string().optional(),
+  general_progress: z.number().min(0).max(100).optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -57,6 +59,7 @@ interface Project {
   github_page?: string;
   github_url?: string;
   notes?: string;
+  general_progress?: number;
   created_at: string;
 }
 
@@ -69,6 +72,7 @@ interface ProjectEditFormProps {
 export const ProjectEditForm = ({ project, onSuccess, onCancel }: ProjectEditFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [steps, setSteps] = useState<Array<{id?: string, step_name: string, step_description: string, progress_percentage: number}>>([]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -92,8 +96,40 @@ export const ProjectEditForm = ({ project, onSuccess, onCancel }: ProjectEditFor
       github_page: project.github_page || "",
       github_url: project.github_url || "",
       notes: project.notes || "",
+      general_progress: project.general_progress || 0,
     },
   });
+
+  // Load project steps
+  useEffect(() => {
+    const loadSteps = async () => {
+      const { data, error } = await supabase
+        .from("project_steps")
+        .select("*")
+        .eq("project_id", project.id)
+        .order("order_index");
+      
+      if (!error && data) {
+        setSteps(data);
+      }
+    };
+    
+    loadSteps();
+  }, [project.id]);
+
+  const addStep = () => {
+    setSteps([...steps, { step_name: "", step_description: "", progress_percentage: 0 }]);
+  };
+
+  const removeStep = (index: number) => {
+    setSteps(steps.filter((_, i) => i !== index));
+  };
+
+  const updateStep = (index: number, field: string, value: string | number) => {
+    const newSteps = [...steps];
+    newSteps[index] = { ...newSteps[index], [field]: value };
+    setSteps(newSteps);
+  };
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
@@ -125,11 +161,42 @@ export const ProjectEditForm = ({ project, onSuccess, onCancel }: ProjectEditFor
           github_page: data.github_page || null,
           github_url: data.github_url || null,
           notes: data.notes || null,
+          general_progress: data.general_progress || 0,
         })
         .eq("id", project.id);
 
       if (error) {
         throw error;
+      }
+
+      // Handle project steps
+      if (steps.length > 0) {
+        // Delete existing steps
+        await supabase
+          .from("project_steps")
+          .delete()
+          .eq("project_id", project.id);
+
+        // Insert new steps
+        const stepsToInsert = steps
+          .filter(step => step.step_name.trim() !== "")
+          .map((step, index) => ({
+            project_id: project.id,
+            step_name: step.step_name,
+            step_description: step.step_description,
+            progress_percentage: step.progress_percentage,
+            order_index: index
+          }));
+
+        if (stepsToInsert.length > 0) {
+          const { error: stepsError } = await supabase
+            .from("project_steps")
+            .insert(stepsToInsert);
+          
+          if (stepsError) {
+            console.error("Error updating steps:", stepsError);
+          }
+        }
       }
 
       toast({
@@ -376,6 +443,100 @@ export const ProjectEditForm = ({ project, onSuccess, onCancel }: ProjectEditFor
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Progresso do Projeto */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-primary flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Progresso do Projeto
+            </h3>
+            <div className="space-y-2">
+              <Label htmlFor="general_progress">Progresso Geral (%)</Label>
+              <div className="space-y-2">
+                <Input
+                  id="general_progress"
+                  type="number"
+                  min="0"
+                  max="100"
+                  {...form.register("general_progress", { valueAsNumber: true })}
+                  placeholder="0"
+                />
+                <Progress value={form.watch("general_progress") || 0} className="h-2" />
+                <p className="text-sm text-muted-foreground">{form.watch("general_progress") || 0}% concluído</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Etapas do Projeto */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-primary">Etapas do Projeto</h3>
+              <Button type="button" variant="outline" size="sm" onClick={addStep}>
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Etapa
+              </Button>
+            </div>
+            
+            <div className="space-y-4">
+              {steps.map((step, index) => (
+                <div key={index} className="p-4 border rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Etapa {index + 1}</h4>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeStep(index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <Label>Nome da Etapa</Label>
+                      <Input
+                        value={step.step_name}
+                        onChange={(e) => updateStep(index, 'step_name', e.target.value)}
+                        placeholder="Ex: Desenvolvimento inicial"
+                      />
+                    </div>
+                    <div>
+                      <Label>Progresso (%)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={step.progress_percentage}
+                        onChange={(e) => updateStep(index, 'progress_percentage', Number(e.target.value))}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label>Descrição</Label>
+                    <Textarea
+                      value={step.step_description}
+                      onChange={(e) => updateStep(index, 'step_description', e.target.value)}
+                      placeholder="Descreva os detalhes desta etapa..."
+                      rows={2}
+                    />
+                  </div>
+                  
+                  <Progress value={step.progress_percentage} className="h-2" />
+                </div>
+              ))}
+              
+              {steps.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Nenhuma etapa cadastrada</p>
+                  <p className="text-sm">Clique em "Adicionar Etapa" para começar</p>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Observações */}

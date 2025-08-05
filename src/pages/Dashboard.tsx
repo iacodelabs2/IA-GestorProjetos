@@ -8,9 +8,10 @@ import { User } from "@supabase/supabase-js";
 import { ProjectForm } from "@/components/ProjectForm";
 import { ProjectTable } from "@/components/ProjectTable";
 import { ProjectEditForm } from "@/components/ProjectEditForm";
-import { Plus, LogOut, Sparkles, Filter } from "lucide-react";
+import { Plus, LogOut, Sparkles, Filter, Target } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 
 interface Project {
   id: string;
@@ -48,6 +49,7 @@ const Dashboard = () => {
   const [saasFilter, setSaasFilter] = useState<string>("");
   const [emailFilter, setEmailFilter] = useState<string>("");
   const [showDetails, setShowDetails] = useState<Project | null>(null);
+  const [projectSteps, setProjectSteps] = useState<any[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -168,6 +170,23 @@ const Dashboard = () => {
 
   const handleViewDetails = (project: Project) => {
     setShowDetails(project);
+    loadProjectSteps(project.id);
+  };
+
+  const loadProjectSteps = async (projectId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("project_steps")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("order_index");
+      
+      if (!error && data) {
+        setProjectSteps(data);
+      }
+    } catch (error) {
+      console.error("Error loading project steps:", error);
+    }
   };
 
   if (!user) {
@@ -461,6 +480,44 @@ const Dashboard = () => {
                         </a>
                       </div>
                     )}
+                  </div>
+                </div>
+              )}
+
+              {/* Progresso Geral */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-primary flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Progresso Geral
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Progresso atual</span>
+                    <span className="font-medium">{showDetails.general_progress || 0}%</span>
+                  </div>
+                  <Progress value={showDetails.general_progress || 0} className="h-3" />
+                </div>
+              </div>
+
+              {/* Etapas do Projeto */}
+              {projectSteps.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-semibold text-primary">Etapas do Projeto</h4>
+                  <div className="space-y-3">
+                    {projectSteps.map((step, index) => (
+                      <div key={step.id} className="p-3 border rounded-lg space-y-2">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h5 className="font-medium text-sm">{step.step_name}</h5>
+                            {step.step_description && (
+                              <p className="text-xs text-muted-foreground mt-1">{step.step_description}</p>
+                            )}
+                          </div>
+                          <span className="text-xs font-medium ml-2">{step.progress_percentage}%</span>
+                        </div>
+                        <Progress value={step.progress_percentage} className="h-2" />
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
