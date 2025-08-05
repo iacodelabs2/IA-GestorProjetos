@@ -33,6 +33,7 @@ interface Project {
   github_page?: string;
   github_url?: string;
   notes?: string;
+  general_progress?: number;
   created_at: string;
 }
 
@@ -45,6 +46,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [locationFilter, setLocationFilter] = useState<string>("");
   const [saasFilter, setSaasFilter] = useState<string>("");
+  const [emailFilter, setEmailFilter] = useState<string>("");
   const [showDetails, setShowDetails] = useState<Project | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -86,12 +88,20 @@ const Dashboard = () => {
       filtered = filtered.filter(project => project.is_saas === isSaas);
     }
     
+    if (emailFilter && emailFilter !== "all") {
+      filtered = filtered.filter(project => project.email === emailFilter);
+    }
+    
     setFilteredProjects(filtered);
-  }, [projects, locationFilter, saasFilter]);
+  }, [projects, locationFilter, saasFilter, emailFilter]);
 
-  // Get unique locations for filter
+  // Get unique locations and emails for filters
   const uniqueLocations = Array.from(
     new Set(projects.map(p => p.system_location).filter(Boolean))
+  );
+  
+  const uniqueEmails = Array.from(
+    new Set(projects.map(p => p.email).filter(Boolean))
   );
 
   useEffect(() => {
@@ -281,13 +291,31 @@ const Dashboard = () => {
                     </Select>
                   </div>
 
-                  {(locationFilter || saasFilter) && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">Email:</span>
+                    <Select value={emailFilter} onValueChange={setEmailFilter}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue placeholder="Todos os emails" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os emails</SelectItem>
+                        {uniqueEmails.map((email) => (
+                          <SelectItem key={email} value={email}>
+                            {email}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {(locationFilter || saasFilter || emailFilter) && (
                     <Button 
                       variant="outline" 
                       size="sm" 
                       onClick={() => {
                         setLocationFilter("");
                         setSaasFilter("");
+                        setEmailFilter("");
                       }}
                     >
                       Limpar filtros

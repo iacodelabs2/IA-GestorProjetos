@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Target } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 interface ProjectFormProps {
   onSuccess: () => void;
@@ -36,6 +37,8 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
   const [githubUrl, setGithubUrl] = useState("");
   const [supabaseProjeto, setSupabaseProjeto] = useState("");
   const [notes, setNotes] = useState("");
+  const [generalProgress, setGeneralProgress] = useState<number>(0);
+  const [steps, setSteps] = useState<Array<{step_name: string, step_description: string, progress_percentage: number}>>([]);
   const { toast } = useToast();
 
   const addUrl = () => {
@@ -54,6 +57,20 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
     setUrls(newUrls);
   };
 
+  const addStep = () => {
+    setSteps([...steps, { step_name: "", step_description: "", progress_percentage: 0 }]);
+  };
+
+  const removeStep = (index: number) => {
+    setSteps(steps.filter((_, i) => i !== index));
+  };
+
+  const updateStep = (index: number, field: string, value: string | number) => {
+    const newSteps = [...steps];
+    newSteps[index] = { ...newSteps[index], [field]: value };
+    setSteps(newSteps);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -64,7 +81,7 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         throw new Error("Usuário não autenticado");
       }
 
-      const { error } = await supabase.from("projects").insert({
+      const { data, error } = await supabase.from("projects").insert({
         user_id: user.id,
         is_saas: isSaas,
         system_title: systemTitle,
@@ -84,11 +101,36 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
         github_password: hasGithub ? githubPassword : null,
         github_page: hasGithub ? githubPage : null,
         github_url: hasGithub ? githubUrl : null,
+        general_progress: generalProgress,
         notes,
-      });
+      }).select();
 
       if (error) {
         throw error;
+      }
+
+      // Insert project steps if project was created successfully
+      if (data && data.length > 0 && steps.length > 0) {
+        const projectId = data[0].id;
+        const stepsToInsert = steps
+          .filter(step => step.step_name.trim() !== "")
+          .map((step, index) => ({
+            project_id: projectId,
+            step_name: step.step_name,
+            step_description: step.step_description,
+            progress_percentage: step.progress_percentage,
+            order_index: index
+          }));
+
+        if (stepsToInsert.length > 0) {
+          const { error: stepsError } = await supabase
+            .from("project_steps")
+            .insert(stepsToInsert);
+          
+          if (stepsError) {
+            console.error("Error inserting steps:", stepsError);
+          }
+        }
       }
 
       onSuccess();
@@ -372,6 +414,104 @@ export const ProjectForm = ({ onSuccess, onCancel }: ProjectFormProps) => {
           />
         </CardContent>
       </Card>
+
+          {/* Progresso do Projeto */}
+          <Card className="modern-card">
+            <CardHeader>
+              <CardTitle className="text-primary flex items-center gap-2">
+                <Target className="w-5 h-5" />
+                Progresso do Projeto
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="general-progress">Progresso Geral (%)</Label>
+                <div className="space-y-2">
+                  <Input
+                    id="general-progress"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={generalProgress}
+                    onChange={(e) => setGeneralProgress(Number(e.target.value))}
+                    placeholder="0"
+                  />
+                  <Progress value={generalProgress} className="h-2" />
+                  <p className="text-sm text-muted-foreground">{generalProgress}% concluído</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Etapas do Projeto */}
+          <Card className="modern-card">
+            <CardHeader>
+              <CardTitle className="text-primary">Etapas do Projeto</CardTitle>
+              <p className="text-sm text-muted-foreground">Gerencie as etapas e progresso individual</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {steps.map((step, index) => (
+                <div key={index} className="p-4 border rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium">Etapa {index + 1}</h4>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeStep(index)}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <Label>Nome da Etapa</Label>
+                      <Input
+                        value={step.step_name}
+                        onChange={(e) => updateStep(index, 'step_name', e.target.value)}
+                        placeholder="Ex: Desenvolvimento inicial"
+                      />
+                    </div>
+                    <div>
+                      <Label>Progresso (%)</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={step.progress_percentage}
+                        onChange={(e) => updateStep(index, 'progress_percentage', Number(e.target.value))}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label>Descrição</Label>
+                    <Textarea
+                      value={step.step_description}
+                      onChange={(e) => updateStep(index, 'step_description', e.target.value)}
+                      placeholder="Descreva os detalhes desta etapa..."
+                      rows={2}
+                    />
+                  </div>
+                  
+                  <Progress value={step.progress_percentage} className="h-2" />
+                </div>
+              ))}
+              
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addStep}
+                className="w-full"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Adicionar Etapa
+              </Button>
+            </CardContent>
+          </Card>
 
           <Separator />
 

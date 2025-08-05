@@ -14,10 +14,52 @@ export type Database = {
   }
   public: {
     Tables: {
+      project_steps: {
+        Row: {
+          created_at: string
+          id: string
+          order_index: number | null
+          progress_percentage: number | null
+          project_id: string
+          step_description: string | null
+          step_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_index?: number | null
+          progress_percentage?: number | null
+          project_id: string
+          step_description?: string | null
+          step_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_index?: number | null
+          progress_percentage?: number | null
+          project_id?: string
+          step_description?: string | null
+          step_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_steps_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       projects: {
         Row: {
           created_at: string
           email: string | null
+          general_progress: number | null
           github_page: string | null
           github_password: string | null
           github_url: string | null
@@ -43,6 +85,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email?: string | null
+          general_progress?: number | null
           github_page?: string | null
           github_password?: string | null
           github_url?: string | null
@@ -68,6 +111,7 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string | null
+          general_progress?: number | null
           github_page?: string | null
           github_password?: string | null
           github_url?: string | null

@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Edit, Trash2, Check, X, Eye } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
 interface Project {
   id: string;
@@ -26,6 +27,7 @@ interface Project {
   github_page?: string;
   github_url?: string;
   notes?: string;
+  general_progress?: number;
   created_at: string;
 }
 
@@ -88,6 +90,7 @@ export const ProjectTable = ({ projects, onRefresh, onEdit, onViewDetails }: Pro
               <th className="table-cell text-left">Local do Sistema</th>
               <th className="table-cell text-left">URL</th>
               <th className="table-cell text-left">Email</th>
+              <th className="table-cell text-left">Progresso</th>
               <th className="table-cell text-center">Possui Supabase?</th>
               <th className="table-cell text-center">Possui GitHub?</th>
               <th className="table-cell text-center">Ações</th>
@@ -119,6 +122,15 @@ export const ProjectTable = ({ projects, onRefresh, onEdit, onViewDetails }: Pro
                 </td>
                 <td className="table-cell text-muted-foreground">
                   {project.email || "-"}
+                </td>
+                <td className="table-cell">
+                  <div className="space-y-1 min-w-[120px]">
+                    <div className="flex justify-between text-xs">
+                      <span>Progresso</span>
+                      <span>{project.general_progress || 0}%</span>
+                    </div>
+                    <Progress value={project.general_progress || 0} className="h-1.5" />
+                  </div>
                 </td>
                 <td className="table-cell text-center">
                   {project.has_supabase ? (
